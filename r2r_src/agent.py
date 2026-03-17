@@ -99,11 +99,11 @@ class Seq2SeqAgent(BaseAgent):
 
         # Models
         if args.vlnbert == 'oscar':
-            self.vln_bert = model_OSCAR.VLNBERT(feature_size=self.feature_size + args.angle_feat_size).cuda()
-            self.critic = model_OSCAR.Critic().cuda()
+            self.vln_bert = model_OSCAR.VLNBERT(feature_size=self.feature_size + args.angle_feat_size).cpu()
+            self.critic = model_OSCAR.Critic().cpu()
         elif args.vlnbert == 'prevalent':
-            self.vln_bert = model_PREVALENT.VLNBERT(feature_size=self.feature_size + args.angle_feat_size).cuda()
-            self.critic = model_PREVALENT.Critic().cuda()
+            self.vln_bert = model_PREVALENT.VLNBERT(feature_size=self.feature_size + args.angle_feat_size).cpu()
+            self.critic = model_PREVALENT.Critic().cpu()
         self.models = (self.vln_bert, self.critic)
 
         # Optimizers
@@ -135,8 +135,8 @@ class Seq2SeqAgent(BaseAgent):
 
         token_type_ids = torch.zeros_like(mask)
 
-        return Variable(sorted_tensor, requires_grad=False).long().cuda(), \
-               mask.long().cuda(), token_type_ids.long().cuda(), \
+        return Variable(sorted_tensor, requires_grad=False).long().cpu(), \
+               mask.long().cpu(), token_type_ids.long().cpu(), \
                list(seq_lengths), list(perm_idx)
 
     def _feature_variable(self, obs):
@@ -144,7 +144,7 @@ class Seq2SeqAgent(BaseAgent):
         features = np.empty((len(obs), args.views, self.feature_size + args.angle_feat_size), dtype=np.float32)
         for i, ob in enumerate(obs):
             features[i, :, :] = ob['feature']  # Image feat
-        return Variable(torch.from_numpy(features), requires_grad=False).cuda()
+        return Variable(torch.from_numpy(features), requires_grad=False).cpu()
 
     def _candidate_variable(self, obs):
         candidate_leng = [len(ob['candidate']) + 1 for ob in obs]  # +1 is for the end
@@ -155,13 +155,13 @@ class Seq2SeqAgent(BaseAgent):
             for j, cc in enumerate(ob['candidate']):
                 candidate_feat[i, j, :] = cc['feature']
 
-        return torch.from_numpy(candidate_feat).cuda(), candidate_leng
+        return torch.from_numpy(candidate_feat).cpu(), candidate_leng
 
     def get_input_feat(self, obs):
         input_a_t = np.zeros((len(obs), args.angle_feat_size), np.float32)
         for i, ob in enumerate(obs):
             input_a_t[i] = utils.angle_feature(ob['heading'], ob['elevation'])
-        input_a_t = torch.from_numpy(input_a_t).cuda()
+        input_a_t = torch.from_numpy(input_a_t).cpu()
         # f_t = self._feature_variable(obs)      # Pano image features from obs
         candidate_feat, candidate_leng = self._candidate_variable(obs)
 
@@ -186,7 +186,7 @@ class Seq2SeqAgent(BaseAgent):
                 else:   # Stop here
                     assert ob['teacher'] == ob['viewpoint']         # The teacher action should be "STAY HERE"
                     a[i] = len(ob['candidate'])
-        return torch.from_numpy(a).cuda()
+        return torch.from_numpy(a).cpu()
 
     def make_equiv_action(self, a_t, perm_obs, perm_idx=None, traj=None):
         """
@@ -434,9 +434,9 @@ class Seq2SeqAgent(BaseAgent):
             total = 0
             for t in range(length-1, -1, -1):
                 discount_reward = discount_reward * args.gamma + rewards[t]  # If it ended, the reward will be 0
-                mask_ = Variable(torch.from_numpy(masks[t]), requires_grad=False).cuda()
+                mask_ = Variable(torch.from_numpy(masks[t]), requires_grad=False).cpu()
                 clip_reward = discount_reward.copy()
-                r_ = Variable(torch.from_numpy(clip_reward), requires_grad=False).cuda()
+                r_ = Variable(torch.from_numpy(clip_reward), requires_grad=False).cpu()
                 v_ = self.critic(hidden_states[t])
                 a_ = (r_ - v_).detach()
 
@@ -565,7 +565,7 @@ class Seq2SeqAgent(BaseAgent):
 
     def load(self, path):
         ''' Loads parameters (but not training state) '''
-        states = torch.load(path)
+        states = torch.load(path, map_location=torch.device('cpu'))
 
         def recover_state(name, model, optimizer):
             state = model.state_dict()

@@ -190,10 +190,10 @@ def train_val(test_only=False):
 
     if test_only:
         featurized_scans = None
-        val_env_names = ['val_train_seen']
+        val_env_names = ['train']
     else:
         featurized_scans = set([key.split("_")[0] for key in list(feat_dict.keys())])
-        val_env_names = ['val_train_seen', 'val_seen', 'val_unseen']
+        val_env_names = ['train', 'val_seen', 'val_unseen']
 
     train_env = R2RBatch(feat_dict, batch_size=args.batchSize, splits=['train'], tokenizer=tok)
     from collections import OrderedDict
@@ -233,10 +233,10 @@ def train_val_augment(test_only=False):
 
     if test_only:
         featurized_scans = None
-        val_env_names = ['val_train_seen']
+        val_env_names = ['train']
     else:
         featurized_scans = set([key.split("_")[0] for key in list(feat_dict.keys())])
-        val_env_names = ['val_train_seen', 'val_seen', 'val_unseen']
+        val_env_names = ['train', 'val_seen', 'val_unseen']
 
     # Load the augmentation data
     aug_path = args.aug

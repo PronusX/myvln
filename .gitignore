@@ -1,26 +1,86 @@
-.ftpignore
-.ftpconfig
+# ====================== 通用忽略 ======================
+# 系统文件
+.DS_Store
+Thumbs.db
 
-# Byte-compiled / optimized / DLL files
+# Git 本身
+/.git/
+
+# 日志
+logs/
+*.log
+debug.log
+
+# 缓存文件
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
 
-connectivity/*
-!connectivity/.gitkeep
+# ====================== 你的项目专属忽略 ======================
+# 1. 图片/可视化资源（完全不上传）
+webgl_imgs/
+sim_imgs/
+img_features/
+Matterport3DSimulator/webgl_imgs/
+Matterport3DSimulator/sim_imgs/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.svg
+*.zip
+*.tsv
 
-data/R2R_test.json
-data/R2R_train.json
-data/R2R_val_seen.json
-data/R2R_val_unseen.json
-data/prevalent/*
-!data/prevalent/.gitkeep
+# 2. 数据集/JSON数据文件
+data/
+connectivity/
+Matterport3DSimulator/connectivity/
+*.json
 
-img_features/*
-!img_features/.gitkeep
+# 3. 预训练模型/权重文件（大文件不上传）
+Prevalent/pretrained_model/
+snap/
+*.bin
+*.pth
+*.pt
+*.h5
+*.ckpt
 
-snap/*
-!snap/.gitkeep
+# 4. Matterport3DSimulator 编译文件/仿真器文件
+Matterport3DSimulator/build/
+Matterport3DSimulator/CMakeFiles/
+Matterport3DSimulator/cmake/
+Matterport3DSimator/models/
+*.so
+*.out
+*.bin
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.marks
+*.dll
+*.dylib
 
-logs/*
-!logs/.gitkeep
+# 5. pybind11 子模块（无需上传）
+Matterport3DSimulator/pybind11/
+
+# 6. 临时文件/快照
+*.gitkeep

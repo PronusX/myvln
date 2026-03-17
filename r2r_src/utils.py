@@ -472,7 +472,7 @@ def length2mask(length, size=None):
     batch_size = len(length)
     size = int(max(length)) if size is None else size
     mask = (torch.arange(size, dtype=torch.int64).unsqueeze(0).repeat(batch_size, 1)
-                > (torch.LongTensor(length) - 1).unsqueeze(1)).cuda()
+                > (torch.LongTensor(length) - 1).unsqueeze(1)).cpu()
     return mask
 
 def average_length(path2inst):
@@ -491,7 +491,7 @@ def tile_batch(tensor, multiplier):
 def viewpoint_drop_mask(viewpoint, seed=None, drop_func=None):
     local_seed = hash(viewpoint) ^ seed
     torch.random.manual_seed(local_seed)
-    drop_mask = drop_func(torch.ones(2048).cuda())
+    drop_mask = drop_func(torch.ones(2048).cpu())
     return drop_mask
 
 
